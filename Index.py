@@ -52,6 +52,10 @@ class product:
         ttk.Button(frame, text= ' SaveProduct ', command=self.add_product).grid(row = 6, columnspan= 2, sticky =W + E)
         
 
+        #Mensajes de alerta
+        self.message = Label(text='', fg = 'red')
+        self.message.grid(row = 3, column=0, columnspan= 2, sticky= W+E)
+        
         #Tabla
         self.tree = ttk.Treeview(height = 10, columns= ('#1', '#2', '#3','#4','#5'))
         self.tree['show'] = 'headings'
@@ -63,6 +67,11 @@ class product:
         self.tree.heading('#5', text = 'Worked Days', anchor= CENTER)
         
         
+        
+        
+        #Botones tabla
+        ttk.Button(text = 'DELETE', command=self.delete_employee).grid(row = 8, column=2, sticky= W + E)
+        ttk.Button(text = 'EDIT').grid(row = 8, column=3, sticky= W + E) 
         
         
         self.get_employees()
@@ -98,10 +107,30 @@ class product:
             query = 'INSERT INTO employees VALUES (?, ?)'
             parameters = (self.name.get(), self.lname.get())
             self.run_query(query, parameters)
-            print ('Datos guardados')
+            self.message['text'] = 'Empleado {} agregado exitosamente'.format(self.name.get())
+            self.name.delete(0, END)
+            self.lname.delete(0, END)
+        
         else:
-             print('Name and second price is requiered')   
+            self.message['text'] = 'Nombre y Precio son requeridos'
         self.get_employees()
+        
+        
+        
+    def delete_employee(self):
+        self.message['text'] = ''
+        try:
+            self.tree.item(self.tree.selection())['text']
+        except IndexError as e:
+            self.message['text'] = 'Porfavor elija un empleado para eliminar su registro'
+            return
+        self.message['text'] = ''
+        name = self.tree.item(self.tree.selection())['text']
+        quey = 'DELETE FROM employees WHERE name = ?'
+        self.run_query(query, (name, ))
+        self.message['text'] = 'Registro {} eliminado satisfactoriamente'.format(name)
+        self.get_employees()
+        
 if __name__ == '__main__':
     window = Tk()
     application = product (window)
