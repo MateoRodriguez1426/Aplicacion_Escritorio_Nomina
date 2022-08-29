@@ -2,7 +2,13 @@ from tkinter import ttk
 from tkinter import *
 import sqlite3
 
-class product:                          #Clase Nomina
+class product: 
+    
+    db_name = 'database.db'
+    
+    
+    
+    #Clase Nomina
     def __init__(self, window):         #Constructor que hace que cada vez que se inicia la clase, ejecute una instancia que le de nombre a la ventana de la aplicacion  
         self.wind = window
         self.wind.title('Products Aplication')
@@ -47,17 +53,40 @@ class product:                          #Clase Nomina
         
 
         #Tabla
-        self.tree = ttk.Treeview(height = 20, columns= 6)
-        self.tree.grid(row = 7, column = 0, columnspan = 2)
-        self.tree.heading('#0', text = 'Name', anchor= CENTER)
-        self.tree.heading('#1', text = 'Last Name', anchor= CENTER)
+        self.tree = ttk.Treeview(height = 10, columns= ('#1', '#2', '#3','#4','#5'))
+        self.tree['show'] = 'headings'
+        self.tree.grid(row = 7, column = 0, columnspan = 6)
+        self.tree.heading('#1', text = 'Name', anchor= CENTER)
+        self.tree.heading('#2', text = 'LastName', anchor= CENTER)
+        self.tree.heading('#3', text = 'Id Document', anchor= CENTER)
+        self.tree.heading('#4', text = 'Wage', anchor= CENTER)
+        self.tree.heading('#5', text = 'Worked Days', anchor= CENTER)
         
-        '''
-        self.tree.heading('#2', text = 'Id Document', anchor= CENTER)
-        self.tree.heading('#3', text = 'Wage', anchor= CENTER)
-        self.tree.heading('#4', text = 'Worked Days', anchor= CENTER)
-        '''
         
+        
+        self.get_employees()
+       
+       
+    def run_runquery(self, query, parameters = ()):
+        with sqlite3.connect(self.db_name) as conn:
+            cursor = conn.cursor()
+            result =  cursor.execute(query, parameters)
+            conn.commit()
+        return result
+    
+    def get_employees (self):
+        #lIMPIAR TABLE
+        records = self.tree.get_children()
+        for element in records:
+            self.tree.delete(element)
+            
+        #query
+        query = 'SELECT * FROM employees ORDER BY name DESC'
+        db_rows = self.run_runquery(query)
+        for row in db_rows:
+            self.tree.insert('', 0, text = row[1], values = row[0])
+            
+                
 if __name__ == '__main__':
     window = Tk()
     application = product (window)
