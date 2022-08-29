@@ -48,8 +48,8 @@ class product:
         self.workdays.grid(row=5, column = 1)
         
       
-        #Entrada de Productos
-        ttk.Button(frame, text= ' SaveProduct ').grid(row = 6, columnspan= 2, sticky =W + E)
+        #Boton Entrada de Productos
+        ttk.Button(frame, text= ' SaveProduct ', command=self.add_product).grid(row = 6, columnspan= 2, sticky =W + E)
         
 
         #Tabla
@@ -64,10 +64,11 @@ class product:
         
         
         
+        
         self.get_employees()
        
        
-    def run_runquery(self, query, parameters = ()):
+    def run_query(self, query, parameters = ()):
         with sqlite3.connect(self.db_name) as conn:
             cursor = conn.cursor()
             result =  cursor.execute(query, parameters)
@@ -82,11 +83,25 @@ class product:
             
         #query
         query = 'SELECT * FROM employees ORDER BY name DESC'
-        db_rows = self.run_runquery(query)
+        db_rows = self.run_query(query)
         for row in db_rows:
             self.tree.insert('', 0, text = row[1], values = row[0])
             
-                
+            
+    def validation(self):
+        return len(self.name.get()) != 0 and len(self.lname.get()) != 0       
+    
+    
+    
+    def add_product(self):
+        if self.validation():
+            query = 'INSERT INTO employees VALUES (?, ?)'
+            parameters = (self.name.get(), self.lname.get())
+            self.run_query(query, parameters)
+            print ('Datos guardados')
+        else:
+             print('Name and second price is requiered')   
+        self.get_employees()
 if __name__ == '__main__':
     window = Tk()
     application = product (window)
